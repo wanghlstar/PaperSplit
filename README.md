@@ -3,6 +3,12 @@
   <h1>PaperSplit</h1>
 </div>
 
+> **二开说明 / Fork Note**
+>
+> 本项目基于上游 [TwoBall/PaperSplit](https://github.com/TwoBall/PaperSplit) 二次开发，新增**三栏切割**与 **macOS / Windows / 飞牛 fnOS 客户端**；原始版权与 MIT 许可保持不变。
+>
+> Forked from [TwoBall/PaperSplit](https://github.com/TwoBall/PaperSplit), adding **three-column splitting** and **macOS / Windows / fnOS apps**. Original copyright and the MIT license are retained.
+
 **[English](#english) | [中文指南](#中文)**
 
 <div id="english"></div>
@@ -23,6 +29,7 @@
     *   **Apply to Same Type**: One-click apply settings to all Odd or all Even pages.
     *   **Apply to All**: Apply current configuration to every page.
 *   **HD Export**: Generates high-quality A4 PDF documents using `jsPDF`, with selectable page-fit modes (standard A4 with margins, auto-trim uniform scaling, stretch-to-fill, or original crop size).
+*   **Desktop & NAS Apps**: The same codebase also builds macOS 13+ (Apple Silicon / Intel), Windows 10/11 x64, and fnOS FPK packages.
 *   **Responsive Design**: Works perfectly on both PC and mobile devices.
 
 ### 🚀 Quick Start
@@ -67,6 +74,7 @@ Open the local URL shown in the terminal (usually `http://localhost:5173`).
     *   **同类页**：一键应用当前配置到所有奇数页或所有偶数页。
     *   **所有页**：一键应用到文档所有页面。
 *   **高清导出**：基于 `jsPDF` 生成高质量的 A4 PDF 文档，并可选择导出尺寸适配方式（标准A4等比留白 / 去白边等比放大 / 拉伸填满 / 原始裁剪尺寸）。
+*   **各端 App**：同一套代码提供 macOS 13+（Apple Silicon / Intel）、Windows 10/11 x64 与飞牛 fnOS 安装包。
 *   **响应式设计**：完美适配 PC 和移动端操作，手机上也能轻松处理试卷。
 
 ### 🚀 快速开始
@@ -98,6 +106,7 @@ npm run dev
 *   **PDF Processing**: `pdfjs-dist` (Rendering), `jspdf` (Generation)
 *   **Styling**: CSS3 (Flexbox/Grid), locally bundled Material Icons / Outfit fonts
 *   **Build**: Vite
+*   **Packaging**: Go static server + Swift/WKWebView (macOS) + Go/Edge app mode (Windows) + fnOS FPK
 
 ## �📂 Project Structure / 项目结构
 
@@ -115,22 +124,28 @@ npm run dev
 │   ├── editor.js       # Split/Seal Line Logic
 │   ├── split-utils.js  # Column Split/Slice Math
 │   └── exporter.js     # PDF Export Logic
-├── packaging/          # macOS app & fnOS FPK build scripts
+├── packaging/          # macOS / Windows / fnOS packaging scripts
 ├── public/             # favicon + bundled fonts
 └── DEPLOY.md           # Deployment Guide
 ```
 
 ## 📦 Desktop & NAS Packages / 桌面与 NAS 打包
 
-PDF.js worker 和字体都已本地打包，两个离线包均不依赖 CDN。
+PDF.js worker 和字体都已本地打包，各端离线包均不依赖 CDN。
 
-- **macOS App**（默认 universal，同时支持 Intel 与 Apple Silicon）
+- **macOS App**（macOS 13+；默认 universal，同时支持 Intel 与 Apple Silicon）
   ```bash
   ./packaging/macos/build-app.sh              # universal
   ARCH=x86_64 ./packaging/macos/build-app.sh  # 仅 Intel
   ARCH=arm64  ./packaging/macos/build-app.sh  # 仅 Apple Silicon
   ```
-  产物：`dist-app/PaperSplit.app` 和对应 zip。采用 ad-hoc 签名；若首次打开被系统拦截，右键 → 打开。
+  产物：`dist-app/PaperSplit.app` 和对应 zip。CI 会分别构建 arm64 与 x86_64 两个 zip。采用 ad-hoc 签名；若首次打开被系统拦截，右键 → 打开，或执行 `xattr -dr com.apple.quarantine PaperSplit.app`。
+
+- **Windows x64**（Windows 10/11，需系统自带 Edge）
+  ```bash
+  ./packaging/windows/build-win.sh
+  ```
+  产物：`dist-packages/PaperSplit-<version>-Windows-x64.zip`（单 exe，内嵌全部网页资源，以 Edge 应用模式打开窗口；无需 .NET / WebView2 运行时）。
 
 - **飞牛 fnOS FPK**
   ```bash
@@ -138,7 +153,7 @@ PDF.js worker 和字体都已本地打包，两个离线包均不依赖 CDN。
   ```
   产物：`dist-packages/papersplit_<version>_all.fpk`（内置 linux x86_64 / aarch64 / armv7 服务端）。在飞牛应用中心手动安装；默认端口 **15100**，安装向导和应用设置中均可修改。
 
-- **GitHub Actions**：`.github/workflows/build-packages.yml` 支持手动触发或 `v*` tag 构建两个包，并上传为 Artifacts。
+- **GitHub Actions**：`.github/workflows/build-packages.yml` 支持手动触发或 push 构建 FPK、macOS（arm64 / x86_64）与 Windows x64，并上传为 Artifacts；推送 `v*` tag 时会自动创建 Release 并附加安装包（仅推分支不会发布 Release）。
 
 ## 📄 License
 

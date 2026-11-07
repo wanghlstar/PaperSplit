@@ -1,7 +1,7 @@
 {
   "name": "paper-split",
   "version": "1.0.0",
-  "description": "A privacy-focused web tool to split A3 PDFs into A4 pages with seal line removal.",
+  "description": "Fork of TwoBall/PaperSplit with three-column splitting and macOS / Windows / fnOS apps. A privacy-focused A3-to-A4 exam paper splitter with seal line removal.",
   "main": "index.js",
   "scripts": {
     "dev": "vite",
