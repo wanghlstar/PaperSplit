@@ -1,11 +1,11 @@
 import * as pdfjsLib from 'pdfjs-dist';
-import { version } from 'pdfjs-dist/package.json';
+import workerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { state, resetState } from './state.js';
 import { elements } from './dom.js';
 import { renderThumbnails, renderCurrentPage, updatePageControls } from './viewer.js';
 
-// 设置 PDF.js Worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${version}/build/pdf.worker.min.mjs`;
+// 设置 PDF.js Worker（随构建产物本地打包，离线可用）
+pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
 
 /**
  * 处理文件上传事件 (Change Event)
