@@ -80,7 +80,7 @@ echo "==> Generating app icon"
 rm -rf "${ICONSET}"
 mkdir -p "${ICONSET}"
 make_icon() {
-    sips -z "$1" "$1" "${ROOT}/public/favicon.png" --out "${ICONSET}/$2" >/dev/null
+    sips -z "$1" "$1" "${ROOT}/packaging/macos/AppIcon-1024.png" --out "${ICONSET}/$2" >/dev/null
 }
 make_icon 16 icon_16x16.png
 make_icon 32 icon_16x16@2x.png
