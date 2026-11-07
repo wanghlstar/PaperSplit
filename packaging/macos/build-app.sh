@@ -30,7 +30,7 @@ build_one() {
     local goarch="$2"
 
     swiftc -O -swift-version 5 \
-        -target "${arch}-apple-macos12.0" \
+        -target "${arch}-apple-macos13.0" \
         -framework AppKit -framework WebKit \
         "${ROOT}/packaging/macos/main.swift" \
         -o "${BUILD_DIR}/${APP_NAME}-${arch}"

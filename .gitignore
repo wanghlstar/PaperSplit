@@ -13,3 +13,6 @@ dist-packages/
 *.njsproj
 *.sln
 *.sw?
+
+packaging/windows/www/*
+!packaging/windows/www/.gitkeep
