@@ -1,0 +1,5 @@
+#!/bin/bash
+
+### uninstall_init
+
+exit 0

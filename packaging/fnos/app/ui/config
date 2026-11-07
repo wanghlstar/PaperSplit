@@ -1,0 +1,19 @@
+{
+    ".url": {
+        "papersplit.Application": {
+            "title": "PaperSplit",
+            "desc": "A3 试卷拆分为 A4",
+            "icon": "images/icon_{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "${papersplit_port}",
+            "url": "/",
+            "allUsers": true,
+            "control": {
+                "accessPerm": "editable",
+                "portPerm": "editable",
+                "pathPerm": "editable"
+            }
+        }
+    }
+}

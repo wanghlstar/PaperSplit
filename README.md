@@ -96,7 +96,7 @@ npm run dev
 
 *   **Core**: Native JavaScript (ES6 Modules)
 *   **PDF Processing**: `pdfjs-dist` (Rendering), `jspdf` (Generation)
-*   **Styling**: CSS3 (Flexbox/Grid), Material Icons, Google Fonts
+*   **Styling**: CSS3 (Flexbox/Grid), locally bundled Material Icons / Outfit fonts
 *   **Build**: Vite
 
 ## �📂 Project Structure / 项目结构
@@ -115,8 +115,30 @@ npm run dev
 │   ├── editor.js       # Split/Seal Line Logic
 │   ├── split-utils.js  # Column Split/Slice Math
 │   └── exporter.js     # PDF Export Logic
+├── packaging/          # macOS app & fnOS FPK build scripts
+├── public/             # favicon + bundled fonts
 └── DEPLOY.md           # Deployment Guide
 ```
+
+## 📦 Desktop & NAS Packages / 桌面与 NAS 打包
+
+PDF.js worker 和字体都已本地打包，两个离线包均不依赖 CDN。
+
+- **macOS App**（默认 universal，同时支持 Intel 与 Apple Silicon）
+  ```bash
+  ./packaging/macos/build-app.sh              # universal
+  ARCH=x86_64 ./packaging/macos/build-app.sh  # 仅 Intel
+  ARCH=arm64  ./packaging/macos/build-app.sh  # 仅 Apple Silicon
+  ```
+  产物：`dist-app/PaperSplit.app` 和对应 zip。采用 ad-hoc 签名；若首次打开被系统拦截，右键 → 打开。
+
+- **飞牛 fnOS FPK**
+  ```bash
+  ./packaging/fnos/build-fpk.sh
+  ```
+  产物：`dist-packages/papersplit_<version>_all.fpk`（内置 linux x86_64 / aarch64 / armv7 服务端）。在飞牛应用中心手动安装；默认端口 **15100**，安装向导和应用设置中均可修改。
+
+- **GitHub Actions**：`.github/workflows/build-packages.yml` 支持手动触发或 `v*` tag 构建两个包，并上传为 Artifacts。
 
 ## 📄 License
 

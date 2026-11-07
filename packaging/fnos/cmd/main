@@ -1,0 +1,116 @@
+#!/bin/bash
+
+APPNAME="papersplit"
+APP_DIR="${TRIM_APPDEST:-/var/apps/${APPNAME}/target}"
+DATA_DIR="${TRIM_PKGVAR:-/var/apps/${APPNAME}/var}"
+WWW_DIR="${APP_DIR}/www"
+BIN="${APP_DIR}/bin/papersplit-server"
+PORT="${papersplit_port:-${TRIM_SERVICE_PORT:-15100}}"
+LOG_FILE="${DATA_DIR}/info.log"
+PID_FILE="${DATA_DIR}/app.pid"
+
+mkdir -p "${DATA_DIR}" >/dev/null 2>&1
+
+log_msg() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')]: INFO $1" >> "${LOG_FILE}"
+}
+
+check_process() {
+    local pid="$1"
+    [ -n "${pid}" ] && kill -0 "${pid}" 2>/dev/null
+}
+
+port_ready() {
+    (echo > "/dev/tcp/127.0.0.1/${PORT}") >/dev/null 2>&1
+}
+
+start_process() {
+    if status; then
+        log_msg "already running, skip start"
+        return 0
+    fi
+
+    if [ ! -x "${BIN}" ]; then
+        log_msg "ERROR: missing executable ${BIN}"
+        return 1
+    fi
+    if [ ! -f "${WWW_DIR}/index.html" ]; then
+        log_msg "ERROR: missing web assets ${WWW_DIR}/index.html"
+        return 1
+    fi
+
+    log_msg "starting on port ${PORT}"
+    "${BIN}" --root "${WWW_DIR}" --host 0.0.0.0 --port "${PORT}" >> "${LOG_FILE}" 2>&1 &
+    local pid=$!
+    printf "%s" "${pid}" > "${PID_FILE}"
+
+    local count=0
+    while [ ${count} -lt 10 ]; do
+        if ! check_process "${pid}"; then
+            log_msg "ERROR: process exited during startup"
+            rm -f "${PID_FILE}"
+            return 1
+        fi
+        if port_ready; then
+            log_msg "started with PID ${pid}"
+            return 0
+        fi
+        sleep 1
+        count=$((count + 1))
+    done
+
+    log_msg "ERROR: port ${PORT} not ready after 10s"
+    return 1
+}
+
+stop_process() {
+    if [ -r "${PID_FILE}" ]; then
+        local pid
+        pid="$(head -n 1 "${PID_FILE}" | tr -d '[:space:]')"
+        if check_process "${pid}"; then
+            log_msg "stopping PID ${pid}"
+            kill -TERM "${pid}" 2>/dev/null
+            local count=0
+            while check_process "${pid}" && [ ${count} -lt 10 ]; do
+                sleep 1
+                count=$((count + 1))
+            done
+            if check_process "${pid}"; then
+                kill -KILL "${pid}" 2>/dev/null
+            fi
+        fi
+        rm -f "${PID_FILE}"
+    fi
+    return 0
+}
+
+status() {
+    if [ -r "${PID_FILE}" ]; then
+        local pid
+        pid="$(head -n 1 "${PID_FILE}" | tr -d '[:space:]')"
+        if check_process "${pid}"; then
+            return 0
+        fi
+        rm -f "${PID_FILE}"
+    fi
+    return 1
+}
+
+case "$1" in
+start)
+    start_process
+    ;;
+stop)
+    stop_process
+    ;;
+status)
+    if status; then
+        exit 0
+    else
+        exit 3
+    fi
+    ;;
+*)
+    exit 1
+    ;;
+esac

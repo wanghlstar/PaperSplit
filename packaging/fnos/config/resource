@@ -1,0 +1,18 @@
+{
+    "data-share":
+    {
+        "shares":
+        [
+            {
+                "name": "papersplit",
+                "permission":
+                {
+                    "rw":
+                    [
+                        "papersplit"
+                    ]
+                }
+            }
+        ]
+    }
+}
