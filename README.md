@@ -20,6 +20,7 @@
 ### ✨ Key Features
 
 *   **Smart Import**: Supports drag-and-drop for A3 PDFs or images (JPG/PNG).
+*   **Page Orientation**: Rotate pages left/right in 90° steps, flip horizontally/vertically, or restore the original orientation. Use thumbnail checkboxes or Select All for batch adjustments. Preview, thumbnails, and every export mode share the same orientation; exporting keeps all pages.
 *   **Visual Splitting**: Supports two- or three-column layouts, with draggable red splitter lines to adjust each cut position.
 *   **Seal Line Removal**:
     *   Dedicated "Remove Seal Line" mode.
@@ -49,6 +50,7 @@ Open the local URL shown in the terminal (usually `http://localhost:5173`).
 #### 3. How to Use
 1.  **Import**: Click "Select File" or drag your file into the workspace.
 2.  **Adjust**:
+    *   Correct the page orientation first. With no pages checked, orientation tools affect the current page; check thumbnails to adjust multiple pages.
     *   Choose **two or three columns**, then move the **Red Lines** to set each cut position.
     *   Click "**Remove Seal Line**" to add a cut-off area if needed (draggable).
 3.  **Batch**: Use "Same Type" or "All Pages" buttons to apply your settings to other pages.
@@ -65,6 +67,7 @@ Open the local URL shown in the terminal (usually `http://localhost:5173`).
 ### ✨ 核心功能
 
 *   **智能导入**：支持拖拽上传 A3 PDF 文件或图片（JPG/PNG）。
+*   **页面方向**：支持左转 / 右转 90°、水平 / 垂直翻转和恢复原始方向。可通过缩略图勾选或全选批量调整；预览、缩略图和所有导出模式方向一致，导出保留全部页面。
 *   **可视化分割**：支持两栏 / 三栏版面，每条红色分割线均可拖动调整切割位置。
 *   **密封线处理**：
     *   支持“去除密封线”模式。
@@ -93,6 +96,7 @@ npm run dev
 #### 3. 使用流程
 1.  **导入**：点击“选择文件”或直接拖拽文件到工作区。
 2.  **调整**：
+    *   先校正页面方向：未勾选时调整当前页；勾选左侧缩略图后可批量旋转或翻转。
     *   选择**两栏 / 三栏**，再移动红色**分割线**确定各栏分页界限。
     *   若有密封线需要去除，点击“去除密封线”，调整灰色虚线区域。
 3.  **批量**：调整好一页后，点击“同类页”或“所有页”将配置应用到其他页面。

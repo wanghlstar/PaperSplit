@@ -3,25 +3,12 @@ import { state } from './state.js';
 import { elements } from './dom.js';
 import { getPageConfig } from './editor.js';
 import { buildColumnRanges, detectContentBounds } from './split-utils.js';
+import { renderPageCanvas } from './page-renderer.js';
+import { updatePageControls } from './viewer.js';
 
 const EXPORT_SCALE = 2;
 const DETECT_SCALE = 0.5;
 const DETECT_MAX_IMAGE_SIDE = 900;
-
-/**
- * 加载图片
- * @param {string} src 图片 DataURL
- * @returns {Promise<HTMLImageElement>}
- */
-async function loadImage(src) {
-    const img = new Image();
-    img.src = src;
-    await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-    });
-    return img;
-}
 
 /**
  * 渲染用于导出的高清 Canvas
@@ -29,21 +16,7 @@ async function loadImage(src) {
  * @returns {Promise<HTMLCanvasElement>}
  */
 async function renderSourceCanvas(pageIndex) {
-    if (state.isPdf) {
-        const page = await state.pdfDoc.getPage(pageIndex);
-        const viewport = page.getViewport({ scale: EXPORT_SCALE });
-        const canvas = document.createElement('canvas');
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-        return canvas;
-    }
-
-    const img = await loadImage(state.fileData);
-    const canvas = document.createElement('canvas');
-    canvas.width = img.width;
-    canvas.height = img.height;
-    canvas.getContext('2d').drawImage(img, 0, 0);
+    const { canvas } = await renderPageCanvas(pageIndex, { scale: state.isPdf ? EXPORT_SCALE : 1 });
     return canvas;
 }
 
@@ -53,24 +26,13 @@ async function renderSourceCanvas(pageIndex) {
  * @returns {Promise<{canvas: HTMLCanvasElement, fullWidth: number, fullHeight: number}>}
  */
 async function renderDetectionCanvas(pageIndex) {
-    if (state.isPdf) {
-        const page = await state.pdfDoc.getPage(pageIndex);
-        const full = page.getViewport({ scale: EXPORT_SCALE });
-        const viewport = page.getViewport({ scale: DETECT_SCALE });
-        const canvas = document.createElement('canvas');
-        canvas.width = Math.max(1, Math.round(viewport.width));
-        canvas.height = Math.max(1, Math.round(viewport.height));
-        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-        return { canvas, fullWidth: full.width, fullHeight: full.height };
-    }
-
-    const img = await loadImage(state.fileData);
-    const scale = Math.min(1, DETECT_MAX_IMAGE_SIDE / Math.max(img.width, img.height));
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.max(1, Math.round(img.width * scale));
-    canvas.height = Math.max(1, Math.round(img.height * scale));
-    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-    return { canvas, fullWidth: img.width, fullHeight: img.height };
+    const { canvas, width, height } = await renderPageCanvas(pageIndex, {
+        scale: state.isPdf ? DETECT_SCALE : 1,
+        maxWidth: state.isPdf ? Infinity : DETECT_MAX_IMAGE_SIDE,
+        maxHeight: state.isPdf ? Infinity : DETECT_MAX_IMAGE_SIDE
+    });
+    const fullScale = state.isPdf ? EXPORT_SCALE : 1;
+    return { canvas, fullWidth: width * fullScale, fullHeight: height * fullScale };
 }
 
 /**
@@ -112,8 +74,10 @@ async function buildTrimPlan() {
  * 遍历每一页，根据切割线和密封线裁剪，每页生成 A4 页面
  */
 export async function exportPdf() {
-    if (!state.pdfDoc && !state.fileData) return;
+    if (state.isExporting || (!state.pdfDoc && !state.fileData)) return;
 
+    state.isExporting = true;
+    updatePageControls();
     elements.exportBtn.disabled = true;
     elements.exportBtn.textContent = '生成中...';
 
@@ -229,6 +193,8 @@ export async function exportPdf() {
         console.error(e);
         alert('导出失败: ' + e.message);
     } finally {
+        state.isExporting = false;
+        updatePageControls();
         elements.exportBtn.disabled = false;
         elements.exportBtn.innerHTML = '<span class="material-icons">save_alt</span> 导出为 PDF (A4)';
     }
