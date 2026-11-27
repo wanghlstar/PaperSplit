@@ -167,6 +167,10 @@ MIT License
 
 ## 📅 Changelog / 更新日志
 
+### 2026-11-27 (PaperSplit 1.1.0)
+- **Page Tools**: Added page selection, rotation, and flipping controls. 新增页面选择、旋转和翻转功能。
+- **Desktop & NAS Packages**: Added offline installers for macOS (Apple Silicon / Intel), Windows x64, and fnOS. 新增 macOS（Apple 芯片 / Intel）、Windows x64 与飞牛 fnOS 离线安装包。
+
 ### 2026-11-07 (Three-Column Support / 三栏支持)
 - **Multi-Column Splitting**: Added a column-count selector (two or three columns) and generic slice export. Each split line is draggable and clamped between its neighbors, so three-column exam papers are cut into three pages per sheet. 新增两栏 / 三栏选择与通用切片导出；每条分割线可独立拖动且不会越过相邻分割线，三栏试卷每张可切出三页。
 - **Auto-Trim Uniform Scaling**: Added an "标准 A4（去白边等比放大）" export mode. It detects page whitespace, crops it, and applies one document-wide scale so every output page keeps the same text size without distortion (about 7–10% larger than plain A4 fit on scanned papers). The stretch-to-fill option is now labelled as distorting. 新增“去白边等比放大”导出模式：自动裁掉扫描空白并全文档统一比例缩放，各页字号一致且不变形；拉伸填满选项已注明会变形。

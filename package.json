@@ -1,6 +1,6 @@
 {
   "name": "paper-split",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Fork of TwoBall/PaperSplit with three-column splitting and macOS / Windows / fnOS apps. A privacy-focused A3-to-A4 exam paper splitter with seal line removal.",
   "main": "index.js",
   "scripts": {
